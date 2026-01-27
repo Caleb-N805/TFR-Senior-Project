@@ -1,48 +1,40 @@
-# Script purpose: connect to Keithley 2450 Power Supply
-
 import pyvisa
 import time
 
-# 1. Initialize the Resource Manager
 rm = pyvisa.ResourceManager()
-
-# 2. List all available resources (USB, GPIB, LAN, etc.)
-# Run this once to find your instrument's specific address
-print("Available Resources:", rm.list_resources())
-
-# 3. Connect to the instrument
-# Replace this string with your actual device address from the list above
-# Example USB: 'USB0::0x05E6::0x2450::04425317::INSTR'
-# Example LAN: 'TCPIP0::192.168.1.50::inst0::INSTR'
-resource_name = 'USB0::0x05E6::0x2450::04425317::INSTR' 
+# Use your specific address here
+smu = rm.open_resource('USB0::0x05E6::0x2450::04419551::INSTR')
 
 try:
-    smu = rm.open_resource(resource_name)
-    smu.timeout = 5000  # Set timeout to 5 seconds
+    # 1. Clear status and reset
+    smu.write("reset()") 
+
+    # 2. Set Sense Function to Voltage
+    # Note: In TSP, we use dot notation, no colons!
+    smu.write("smu.measure.func = smu.FUNC_DC_VOLTAGE")
+
+    # 3. Enable 4-Wire (Remote Sense)
+    smu.write("smu.measure.sense = smu.SENSE_4WIRE")
+
+    # 4. Set Source Function and Level
+    smu.write("smu.source.func = smu.FUNC_DC_VOLTAGE")
+    smu.write("smu.source.level = 1.0")
     
-    # 4. Identify the instrument
-    idn = smu.query("*IDN?")
-    print(f"Successfully connected to: {idn}")
+    # 5. Set Current Limit (Compliance)
+    smu.write("smu.source.ilimit.level = 0.1")
 
-    # Configure for Voltage Sourcing and Current Measurement
-    smu.write(":SOUR:FUNC VOLT")          # Set source function to Voltage
-    smu.write(":SOUR:VOLT:LEV 1.0")       # Set source level to 1V
-    smu.write(":SENS:FUNC 'CURR'")        # Set measurement function to Current
-    smu.write(":SENS:CURR:RANG:AUTO ON")  # Enable auto-ranging for current
+    print("4-Wire Sense (TSP) Enabled and Source Configured.")
 
-    # Turn on the output
-    smu.write(":OUTP ON")
-
-    # Wait a moment for stability and take a reading
+    # 6. Turn on output and read
+    smu.write("smu.source.output = smu.ON")
     time.sleep(0.5)
-    current_reading = smu.query(":READ?")
-    print(f"Measured Current: {current_reading} A")
+    
+    # In TSP, we use smu.measure.read() to get data
+    current_val = smu.query("print(smu.measure.read())")
+    print(f"Measured Value: {current_val.strip()}")
 
-    # Turn off the output
-    smu.write(":OUTP OFF")
-
+    smu.write("smu.source.output = smu.OFF")
 
 finally:
-    # Always close the connection when finished
     smu.close()
     rm.close()
