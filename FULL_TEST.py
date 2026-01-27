@@ -1,2 +1,1 @@
-import 1_inittest as f
-
+import 1_initialization as f
