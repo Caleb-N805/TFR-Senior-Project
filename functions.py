@@ -22,7 +22,7 @@ def config_4wire_resistance_mode(instrument, vlimit=1):
     # Set to 4-Wire Sense
     instrument.write("smu.measure.sense = smu.SENSE_4WIRE")
     # Set Current Limit (Compliance)
-    instrument.write(f"smu.source.ilimit.level = {ilimit}")
+    instrument.write(f"smu.source.ilimit.level = {vlimit}")
     print("TSP: 4-Wire Source Configured.")
 
 def get_TCR(thickness):
