@@ -5,6 +5,7 @@ import time
 # --- Setup Connection ---
 resource_id = 'USB0::0x05E6::0x2450::04419551::INSTR'
 smu, rm = f.initialize_smu(resource_id)
+f.tprint("Program Start")
 
 # Configure for Current Sourcing and 4-Wire Resistance
 # Note: Ensure your library has a function for smu.FUNC_DC_CURRENT
@@ -23,6 +24,7 @@ try:
     print("\nMeasuring baseline R_chuck...")
     r_chuck = f.measure_resistance(smu, 1e-4) 
     print(f"R_chuck: {r_chuck:.4f} Ω")
+    f.tprint("Measuring Chuck Resistance...")
 
     # --- 6.1.4: Initialization ---
     i = 1
@@ -37,6 +39,7 @@ try:
         # 6.1.5: Apply forcing current and measure resistance
         # Logic matches the gray box in your flowchart
         r_i = f.measure_resistance(smu, current_i)
+        f.tprint("Applying Current...")
         
         # Calculate Power (P = I^2 * R)
         p_i = (current_i ** 2) * r_i
@@ -59,6 +62,7 @@ try:
         # Flowchart requires: T_i >= (T_chuck + 50) AND i >= 5
         if t_i >= (t_chuck + 50) and i >= 5:
             print("\nTarget temperature (+50°C) and iteration count (>=5) met.")
+            f.tprint("Initialization Loop Finished.")
             break
         
         # Increment for next iteration

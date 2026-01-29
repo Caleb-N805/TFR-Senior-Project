@@ -27,7 +27,6 @@ def config_4wire_resistance_mode(instrument, vlimit=1):
 
 def get_TCR(thickness):
     """Finds TCR based on thin film thickness in nm"""
-
     TCR_table = {
         200:0.00336,
         100:0.00329,
