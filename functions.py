@@ -1,9 +1,12 @@
 import pyvisa
 import time
 from datetime import datetime
+from pathlib import Path
+log_folder = Path("TFR-Senior-Project/logs")
 start_func_time = time.perf_counter()
 session_start = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
-time_file = f"log_{session_start}.log"
+log_folder.mkdir(parents=True, exist_ok=True)
+time_file = log_folder / f"log_{session_start}.log"
 
 def initialize_smu(resource_id):
     """Connects to the instrument and performs a basic reset."""
