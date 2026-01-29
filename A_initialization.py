@@ -11,12 +11,10 @@ smu, rm = f.initialize_smu(resource_id)
 f.config_4wire_resistance_mode(smu, v_limit=1) 
 
 try:
-    # --- 6.1.1 & 6.1.3: User Inputs ---
-    print("--- JESD33B Initial Parameters ---")
+    # Initilization Inputs
     t_chuck = 20 # Chuck Temperature (°C)
     i_initial = 65 / 1000 # Initial Current I1 (Amps)
     f_current = 1.28 # Current Multiplier
-    
     film_thickness = 200 # Film thickness in nm
     tcr_ref = f.get_TCR(film_thickness) # TCR in K^-1
 
