@@ -1,4 +1,9 @@
 import pyvisa
+import time
+from datetime import datetime
+start_func_time = time.perf_counter()
+session_start = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
+time_file = f"log_{session_start}.log"
 
 def initialize_smu(resource_id):
     """Connects to the instrument and performs a basic reset."""
@@ -50,3 +55,15 @@ def measure_resistance(instrument, current_level):
     res = instrument.query("print(smu.measure.read())")
     
     return float(res.strip())
+
+def tprint (string):
+    now = datetime.now()
+    perf_now = time.perf_counter()
+    timestamp_str = now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+    total_elapsed = perf_now - start_func_time
+    hours, rem = divmod(total_elapsed, 3600)
+    minutes, seconds = divmod(rem, 60)
+    elapsed_str = f"{int(hours):02}:{int(minutes):02}:{seconds:06.3f}"
+    log_entry = f"[{timestamp_str}] (Total Time Elapsed: {elapsed_str}) - {string}\n"
+    with open(time_file, "a") as f:
+        f.write(log_entry)

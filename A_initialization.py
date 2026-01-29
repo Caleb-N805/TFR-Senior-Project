@@ -22,7 +22,7 @@ try:
     # We use a low current (e.g., 100uA) to prevent self-heating during the baseline
     print("\nMeasuring baseline R_chuck...")
     r_chuck = f.measure_resistance(smu, 1e-4) 
-    print(f"R_chuck measured: {r_chuck:.4f} Ω")
+    print(f"R_chuck: {r_chuck:.4f} Ω")
 
     # --- 6.1.4: Initialization ---
     i = 1
