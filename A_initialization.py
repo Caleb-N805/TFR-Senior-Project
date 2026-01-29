@@ -39,7 +39,6 @@ try:
         # 6.1.5: Apply forcing current and measure resistance
         # Logic matches the gray box in your flowchart
         r_i = f.measure_resistance(smu, current_i)
-        f.tprint("Applying Current...")
         
         # Calculate Power (P = I^2 * R)
         p_i = (current_i ** 2) * r_i
@@ -48,7 +47,8 @@ try:
         # Ti = T_chuck + (delta_R / (R_chuck * TCR))
         t_i = t_chuck + ((r_i - r_chuck) / (r_chuck * tcr_ref))
         
-        print(f"[{i}] I: {current_i:.4e} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
+        print(f"[{i}] I: {current_i:.4f} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
+        f.tprint(f"Applying Current... {current_i:.4f} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
 
         # 6.1.6: Check for failure
         if r_i >= r_fail_init:
