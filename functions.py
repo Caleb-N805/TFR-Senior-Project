@@ -15,10 +15,10 @@ def initialize_smu(resource_id):
     instrument.write("reset()")
     return instrument, rm
 
-def config_4wire_v_source(instrument, ilimit=0.1):
-    """Sets up 4-wire sense for voltage sourcing."""
-    # Set to Voltage Source
-    instrument.write("smu.source.func = smu.FUNC_DC_VOLTAGE")
+def config_4wire_resistance_mode(instrument, vlimit=1):
+    """Sets up 4-wire sense for current sourcing."""
+    # Set to Current Source
+    instrument.write("smu.source.func = smu.FUNC_DC_CURRENT")
     # Set to 4-Wire Sense
     instrument.write("smu.measure.sense = smu.SENSE_4WIRE")
     # Set Current Limit (Compliance)
