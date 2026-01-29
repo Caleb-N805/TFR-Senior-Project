@@ -2,7 +2,7 @@ import pyvisa
 import time
 from datetime import datetime
 from pathlib import Path
-log_folder = Path("TFR-Senior-Project/logs")
+log_folder = Path("logs")
 start_func_time = time.perf_counter()
 session_start = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
 log_folder.mkdir(parents=True, exist_ok=True)
