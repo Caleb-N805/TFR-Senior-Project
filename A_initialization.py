@@ -48,7 +48,7 @@ try:
         t_i = t_chuck + ((r_i - r_chuck) / (r_chuck * tcr_ref))
         
         print(f"[{i}] I: {current_i:.4f} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
-        f.tprint(f"Applying Current... {current_i:.4f} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
+        f.tprint(f"Applying Current - I: {current_i:.4f} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
 
         # 6.1.6: Check for failure
         if r_i >= r_fail_init:
