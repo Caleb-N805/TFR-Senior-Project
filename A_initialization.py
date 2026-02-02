@@ -28,6 +28,7 @@ try:
 
     # --- 6.1.4: Initialization ---
     i = 1
+    count = i
     current_i = i_initial
     r_fail_init = r_chuck + (1 + (tcr_ref * 50))
     
@@ -62,7 +63,7 @@ try:
         # Flowchart requires: T_i >= (T_chuck + 50) AND i >= 5
         if t_i >= (t_chuck + 50) and i >= 5:
             print("\nTarget temperature (+50°C) and iteration count (>=5) met.")
-            f.tprint("Initialization Loop Finished.")
+            f.tprint(f"Initialization loop finished with {i} loops completed.")
             break
         
         # Increment for next iteration
