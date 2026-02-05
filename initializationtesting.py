@@ -1,4 +1,4 @@
-import functions as f
+import functionstesting as f
 import sys
 import time
 import json
@@ -10,15 +10,16 @@ f.tprint("Program Start")
 
 # Configure for Current Sourcing and 4-Wire Resistance
 # Note: Ensure your library has a function for smu.FUNC_DC_CURRENT
-f.config_4wire_resistance_mode(smu, vlimit=1) 
+f.config_2wire_resistance_mode(smu, vlimit=1) 
 
 try:
     # Initilization Inputs
     t_chuck = 20 # Chuck Temperature (°C)
-    i_initial = 65 / 1000 # Initial Current I1 (Amps)
+    i_initial = 10 / 1000 # Initial Current I1 (Amps)
     f_current = 1.28 # Current Multiplier
     film_thickness = 200 # Film thickness in nm
-    tcr_ref = f.get_TCR(film_thickness) # TCR in K^-1
+    tcr_ref = .0003
+    #f.get_TCR(film_thickness) # TCR in K^-1
 
     # Create JSON file
 
@@ -27,7 +28,7 @@ try:
     # 6.1.1: Measure initial resistance (R_chuck) at a very low current
     # We use a low current (e.g., 100uA) to prevent self-heating during the baseline
     print("\nMeasuring baseline R_chuck...")
-    r_chuck = f.measure_resistance(smu, 1e-4) 
+    r_chuck = f.measure_resistance(smu, 1e-2) 
     print(f"R_chuck: {r_chuck:.4f} Ω")
     f.tprint("Measuring Chuck Resistance...")
 
@@ -57,7 +58,7 @@ try:
         f.tprint(f"Applying Current - I: {current_i:.4f} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
 
         # 6.1.6: Check for failure
-        if r_i >= r_fail_init:
+        if r_i >= r_fail_init or current_i > 1000:
             print("!! FAILURE DETECTED: Resistance limit exceeded. Exiting.")
             break
 

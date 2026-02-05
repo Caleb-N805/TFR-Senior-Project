@@ -18,15 +18,18 @@ def initialize_smu(resource_id):
     instrument.write("reset()")
     return instrument, rm
 
-def config_4wire_resistance_mode(instrument, vlimit=1):
-    """Sets up 4-wire sense for current sourcing."""
+def config_2wire_resistance_mode(instrument, vlimit=1):
+    """Sets up 2-wire sense for current sourcing."""
     # Set to Current Source
     instrument.write("smu.source.func = smu.FUNC_DC_CURRENT")
-    # Set to 4-Wire Sense
-    instrument.write("smu.measure.sense = smu.SENSE_4WIRE")
-    # Set Current Limit (Compliance)
+    
+    # Set to 2-Wire Sense
+    # This matches your physical 2-wire connection
+    instrument.write("smu.measure.sense = smu.SENSE_2WIRE")
+    
+    # Set Voltage Limit (Compliance)
     instrument.write(f"smu.source.vlimit.level = {vlimit}")
-    print("TSP: 4-Wire Source Configured.")
+    print("TSP: 2-Wire Source Configured.")
 
 def get_TCR(thickness):
     """Finds TCR based on thin film thickness in nm"""
@@ -48,15 +51,24 @@ def get_TCR(thickness):
         return "Error: Input not found in table"
     
 def measure_resistance(instrument, current_level):
-    """Sets current, measures resistance, and returns value."""
+    """Sets current, measures voltage, and returns calculated resistance."""
+    # 1. Set the source level
     instrument.write(f"smu.source.level = {current_level}")
+    
+    # 2. Ensure SMU is measuring Voltage
+    instrument.write("smu.measure.func = smu.FUNC_DC_VOLTAGE")
+    
+    # 3. Turn on the output
     instrument.write("smu.source.output = smu.ON")
     
-    # Query the resistance measure function of the 2450
-    # The 2450 can return R directly if smu.measure.func = smu.FUNC_RESISTANCE is set
-    res = instrument.query("print(smu.measure.read())")
+    # 4. Query the voltage measurement
+    v_measured = instrument.query("print(smu.measure.read())")
+    v_float = float(v_measured.strip())
     
-    return float(res.strip())
+    # 5. Calculate Resistance (R = V / I)
+    calculated_r = v_float / current_level
+    
+    return calculated_r
 
 def tprint (string):
     now = datetime.now()

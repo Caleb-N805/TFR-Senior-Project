@@ -1,4 +1,4 @@
-import Functions as f
+import functions as f
 import time
 import math
 import json
