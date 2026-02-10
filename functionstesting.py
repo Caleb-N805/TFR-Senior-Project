@@ -18,7 +18,7 @@ def initialize_smu(resource_id):
     instrument.write("reset()")
     return instrument, rm
 
-def config_2wire_resistance_mode(instrument, vlimit=1):
+def config_2wire_resistance_mode(instrument, vlimit):
     """Sets up 2-wire sense for current sourcing."""
     # Set to Current Source
     instrument.write("smu.source.func = smu.FUNC_DC_CURRENT")

@@ -16,7 +16,7 @@ try:
     # Initilization Inputs
     t_chuck = 20 # Chuck Temperature (°C)
     i_initial = 10 / 1000 # Initial Current I1 (Amps)
-    f_current = 1.28 # Current Multiplier
+    f_current = 1.05 # Current Multiplier
     film_thickness = 200 # Film thickness in nm
     tcr_ref = .0003
     #f.get_TCR(film_thickness) # TCR in K^-1
@@ -52,7 +52,7 @@ try:
         
         # Calculate Temperature Ti
         # Ti = T_chuck + (delta_R / (R_chuck * TCR))
-        t_i = t_chuck + ((r_i - r_chuck) / (r_chuck * tcr_ref))
+        t_i = max(t_chuck, t_chuck + ((r_i - r_chuck) / (r_chuck * tcr_ref)))
         
         print(f"[{i}] I: {current_i:.4f} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
         f.tprint(f"Applying Current - I: {current_i:.4f} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
