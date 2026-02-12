@@ -1,12 +1,16 @@
 import pyvisa
 import time
+import csv
 from datetime import datetime
 from pathlib import Path
+
+# Variables
 log_folder = Path("logs")
 start_func_time = time.perf_counter()
 session_start = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
 log_folder.mkdir(parents=True, exist_ok=True)
-time_file = log_folder / f"log_{session_start}.log"
+log_file = log_folder / f"log_{session_start}.csv"
+headers = ["Date", "Time Elapsed", "Iteration #", "Current (mA)", "Resistance (Ω)", "Change in Temperature (°C)"]
 
 def initialize_smu(resource_id):
     """Connects to the instrument and performs a basic reset."""
@@ -79,5 +83,22 @@ def tprint (string):
     minutes, seconds = divmod(rem, 60)
     elapsed_str = f"{int(hours):02}:{int(minutes):02}:{seconds:06.3f}"
     log_entry = f"[{timestamp_str}] (Total Time Elapsed: {elapsed_str}) - {string}\n"
-    with open(time_file, "a", encoding="utf-8") as f:
+    with open(log_file, "a", encoding="utf-8") as f:
         f.write(log_entry)
+
+def csvheader ():
+    with open(log_file, "a", newline = "", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(headers)
+
+def printcsv (iteration, current, resistance, temperature):
+    with open(log_file, "a", newline = '', encoding = "utf-8") as f:
+        writer = csv.writer(f)
+        now = datetime.now()
+        perf_now = time.perf_counter()
+        timestamp_str = now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        total_elapsed = perf_now - start_func_time
+        hours, rem = divmod(total_elapsed, 3600)
+        minutes, seconds = divmod(rem, 60)
+        elapsed_str = f"{int(hours):02}:{int(minutes):02}:{seconds:06.3f}"
+        writer.writerow([timestamp_str, elapsed_str, iteration, f"{current:.3f}", f"{resistance:.3f}", f"{temperature:.3f}"])
