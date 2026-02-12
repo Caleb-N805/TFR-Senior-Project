@@ -109,7 +109,7 @@ def measure_resistance_4wire(instrument, current_level):
     
     return calculated_r
 
-def tprint (string):
+def tprint(string):
     now = datetime.now()
     perf_now = time.perf_counter()
     timestamp_str = now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
