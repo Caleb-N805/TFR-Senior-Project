@@ -35,6 +35,16 @@ def config_2wire_resistance_mode(instrument, vlimit):
     instrument.write(f"smu.source.vlimit.level = {vlimit}")
     print("TSP: 2-Wire Source Configured.")
 
+def config_4wire_resistance_mode(instrument, vlimit):
+    """Sets up 4-wire sense for current sourcing."""
+    # Set to Current Source
+    instrument.write("smu.source.func = smu.FUNC_DC_CURRENT")
+    # Set to 4-Wire Sense
+    instrument.write("smu.measure.sense = smu.SENSE_4WIRE")
+    # Set Current Limit (Compliance)
+    instrument.write(f"smu.source.vlimit.level = {vlimit}")
+    print("TSP: 4-Wire Source Configured.")
+
 def get_TCR(thickness):
     """Finds TCR based on thin film thickness in nm"""
     TCR_table = {
@@ -54,7 +64,7 @@ def get_TCR(thickness):
     else:
         return "Error: Input not found in table"
     
-def measure_resistance(instrument, current_level):
+def measure_resistance_2wire(instrument, current_level):
     """Sets current, measures voltage, and returns calculated resistance."""
     # 1. Set the source level
     instrument.write(f"smu.source.level = {current_level}")
@@ -74,7 +84,35 @@ def measure_resistance(instrument, current_level):
     
     return calculated_r
 
-def tprint (string):
+def measure_resistance_4wire(instrument, current_level):
+    """Sets current, measures voltage using 4-wire sense, and returns resistance."""
+    # 1. Set the source level
+    instrument.write(f"smu.source.level = {current_level}")
+    
+    # 2. Set measurement function to Voltage
+    instrument.write("smu.measure.func = smu.FUNC_DC_VOLTAGE")
+
+    # --- NEW: Enable 4-Wire (Remote) Sensing ---
+    # This tells the SMU to use the 'Sense' terminals instead of the 'Input' terminals
+    instrument.write("smu.measure.sense = smu.SENSE_REMOTE")
+    # -------------------------------------------
+    
+    # 3. Turn on the output
+    instrument.write("smu.source.output = smu.ON")
+    
+    # 4. Query the voltage measurement
+    v_measured = instrument.query("print(smu.measure.read())")
+    v_float = float(v_measured.strip())
+    
+    # 5. Calculate Resistance (R = V / I)
+    calculated_r = v_float / current_level
+    
+    # Optional: Turn output off after measurement to be safe
+    # instrument.write("smu.source.output = smu.OFF")
+    
+    return calculated_r
+
+def tprint(string):
     now = datetime.now()
     perf_now = time.perf_counter()
     timestamp_str = now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
