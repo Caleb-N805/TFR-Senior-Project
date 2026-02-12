@@ -36,7 +36,7 @@ try:
     i = 1
     count = i
     current_i = i_initial
-    r_fail_init = r_chuck * (1 + (tcr_ref * 50))
+    r_fail_init = 2 * r_chuck * (1 + (tcr_ref * 50))
     print("Resistance limit is ", r_fail_init)
     
     # Data storage for 6.1.7 determination
