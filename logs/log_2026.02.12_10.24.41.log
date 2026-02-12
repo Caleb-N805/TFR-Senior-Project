@@ -1,0 +1,28 @@
+[2026-02-12 10:24:41.394] (Total Time Elapsed: 00:00:00.093) - Program Start
+[2026-02-12 10:24:42.013] (Total Time Elapsed: 00:00:00.713) - Measuring Chuck Resistance...
+[2026-02-12 10:24:42.093] (Total Time Elapsed: 00:00:00.793) - Applying Current - I: 0.0050 A | R: 573.8883 Ω | ΔT: 0.00 °C
+[2026-02-12 10:24:43.167] (Total Time Elapsed: 00:00:01.867) - Applying Current - I: 0.0053 A | R: 575.6351 Ω | ΔT: 0.00 °C
+[2026-02-12 10:24:44.243] (Total Time Elapsed: 00:00:02.942) - Applying Current - I: 0.0055 A | R: 578.4654 Ω | ΔT: 0.00 °C
+[2026-02-12 10:24:45.317] (Total Time Elapsed: 00:00:04.016) - Applying Current - I: 0.0058 A | R: 581.2730 Ω | ΔT: 0.06 °C
+[2026-02-12 10:24:46.396] (Total Time Elapsed: 00:00:05.095) - Applying Current - I: 0.0061 A | R: 584.0071 Ω | ΔT: 0.84 °C
+[2026-02-12 10:24:47.470] (Total Time Elapsed: 00:00:06.169) - Applying Current - I: 0.0064 A | R: 586.9238 Ω | ΔT: 1.66 °C
+[2026-02-12 10:24:48.544] (Total Time Elapsed: 00:00:07.243) - Applying Current - I: 0.0067 A | R: 589.4989 Ω | ΔT: 2.38 °C
+[2026-02-12 10:24:49.619] (Total Time Elapsed: 00:00:08.318) - Applying Current - I: 0.0070 A | R: 592.1717 Ω | ΔT: 3.14 °C
+[2026-02-12 10:24:50.694] (Total Time Elapsed: 00:00:09.393) - Applying Current - I: 0.0074 A | R: 595.1078 Ω | ΔT: 3.97 °C
+[2026-02-12 10:24:51.768] (Total Time Elapsed: 00:00:10.467) - Applying Current - I: 0.0078 A | R: 598.4580 Ω | ΔT: 4.91 °C
+[2026-02-12 10:24:52.843] (Total Time Elapsed: 00:00:11.542) - Applying Current - I: 0.0081 A | R: 602.2509 Ω | ΔT: 5.98 °C
+[2026-02-12 10:24:53.918] (Total Time Elapsed: 00:00:12.617) - Applying Current - I: 0.0086 A | R: 606.2913 Ω | ΔT: 7.12 °C
+[2026-02-12 10:24:54.993] (Total Time Elapsed: 00:00:13.692) - Applying Current - I: 0.0090 A | R: 610.6925 Ω | ΔT: 8.36 °C
+[2026-02-12 10:24:56.068] (Total Time Elapsed: 00:00:14.768) - Applying Current - I: 0.0094 A | R: 615.5191 Ω | ΔT: 9.73 °C
+[2026-02-12 10:24:57.143] (Total Time Elapsed: 00:00:15.842) - Applying Current - I: 0.0099 A | R: 620.7783 Ω | ΔT: 11.21 °C
+[2026-02-12 10:24:58.218] (Total Time Elapsed: 00:00:16.917) - Applying Current - I: 0.0104 A | R: 626.8980 Ω | ΔT: 12.94 °C
+[2026-02-12 10:24:59.370] (Total Time Elapsed: 00:00:18.069) - Applying Current - I: 0.0109 A | R: 633.7590 Ω | ΔT: 14.87 °C
+[2026-02-12 10:25:00.445] (Total Time Elapsed: 00:00:19.144) - Applying Current - I: 0.0115 A | R: 641.8291 Ω | ΔT: 17.15 °C
+[2026-02-12 10:25:01.520] (Total Time Elapsed: 00:00:20.219) - Applying Current - I: 0.0120 A | R: 650.7024 Ω | ΔT: 19.65 °C
+[2026-02-12 10:25:02.595] (Total Time Elapsed: 00:00:21.294) - Applying Current - I: 0.0126 A | R: 660.6819 Ω | ΔT: 22.47 °C
+[2026-02-12 10:25:03.669] (Total Time Elapsed: 00:00:22.368) - Applying Current - I: 0.0133 A | R: 672.1831 Ω | ΔT: 25.71 °C
+[2026-02-12 10:25:04.743] (Total Time Elapsed: 00:00:23.442) - Applying Current - I: 0.0139 A | R: 685.4564 Ω | ΔT: 29.46 °C
+[2026-02-12 10:25:05.817] (Total Time Elapsed: 00:00:24.516) - Applying Current - I: 0.0146 A | R: 701.3369 Ω | ΔT: 33.94 °C
+[2026-02-12 10:25:06.892] (Total Time Elapsed: 00:00:25.591) - Applying Current - I: 0.0154 A | R: 719.4005 Ω | ΔT: 39.03 °C
+[2026-02-12 10:25:07.966] (Total Time Elapsed: 00:00:26.666) - Applying Current - I: 0.0161 A | R: 739.8418 Ω | ΔT: 44.80 °C
+[2026-02-12 10:25:09.040] (Total Time Elapsed: 00:00:27.740) - Applying Current - I: 0.0169 A | R: 764.5962 Ω | ΔT: 51.79 °C

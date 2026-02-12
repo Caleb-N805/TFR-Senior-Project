@@ -10,6 +10,7 @@ f_current = 1.05 # Current Multiplier
 film_thickness = 200 # Film thickness in nm
 tcr_ref = .0003
 c_limit = 2 # Amps
+v_limit = 10 # Volts
 #f.get_TCR(film_thickness) # TCR in K^-1
 
 # --- Setup Connection ---
@@ -19,9 +20,9 @@ f.tprint("Program Start")
 
 # Configure for Current Sourcing and 4-Wire Resistance
 # Note: Ensure your library has a function for smu.FUNC_DC_CURRENT
-f.config_2wire_resistance_mode(smu, vlimit=5) 
+f.config_2wire_resistance_mode(smu, v_limit) 
 
-r_chuck = f.measure_resistance(smu, 1) 
+r_chuck = f.measure_resistance(smu, 1e-2) 
 print(f"R_chuck: {r_chuck:.4f} Ω")
 
 # Safety: Always turn off output and close connection

@@ -5,12 +5,13 @@ import json
 
 # Initilization Inputs
 t_chuck = 20 # Chuck Temperature (°C)
-i_initial = 1.05 # Initial Current I1 (Amps)
-f_current = 1 # Current Multiplier
+i_initial = .5e-2 # Initial Current I1 (Amps)
+f_current = 1.05 # Current Multiplier
 film_thickness = 200 # Film thickness in nm
-tcr_ref = .0003
-c_limit = 1000 # Amps
-v_limit = 15 # Volts
+tcr_ref = .0061
+c_limit = .1 # Amps
+v_limit = 20 # Volts
+time_delay = 1 # seconds
 #f.get_TCR(film_thickness) # TCR in K^-1
 
 # --- Setup Connection ---
@@ -35,7 +36,8 @@ try:
     i = 1
     count = i
     current_i = i_initial
-    r_fail_init = r_chuck + (1 + (tcr_ref * 50))
+    r_fail_init = r_chuck * (1 + (tcr_ref * 50))
+    print("Resistance limit is ", r_fail_init)
     
     # Data storage for 6.1.7 determination
     results = []
@@ -64,6 +66,9 @@ try:
         # Save data point
         results.append({'i': i, 'I': current_i, 'R': r_i, 'P': p_i, 'T': t_i})
 
+        # Set arbitrary delay
+        time.sleep(time_delay)
+
         # --- Exit Condition Logic ---
         # Flowchart requires: T_i >= (T_chuck + 50) AND i >= 5
         if t_i >= (t_chuck + 50) and i >= 5:
@@ -77,6 +82,9 @@ try:
 
     # 6.1.7: Proceed to Determination of Rth
     print(f"\nLoop Finished. Collected {len(results)} data points.")
+
+    # Print number of iterations
+    print("Number of iterations was", i)
 
 finally:
     # Safety: Always turn off output and close connection
