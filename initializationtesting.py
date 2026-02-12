@@ -3,6 +3,16 @@ import sys
 import time
 import json
 
+# Initilization Inputs
+t_chuck = 20 # Chuck Temperature (°C)
+i_initial = 1.05 # Initial Current I1 (Amps)
+f_current = 1 # Current Multiplier
+film_thickness = 200 # Film thickness in nm
+tcr_ref = .0003
+c_limit = 1000 # Amps
+v_limit = 15 # Volts
+#f.get_TCR(film_thickness) # TCR in K^-1
+
 # --- Setup Connection ---
 resource_id = 'USB0::0x05E6::0x2450::04419551::INSTR'
 smu, rm = f.initialize_smu(resource_id)
@@ -10,20 +20,9 @@ f.tprint("Program Start")
 
 # Configure for Current Sourcing and 4-Wire Resistance
 # Note: Ensure your library has a function for smu.FUNC_DC_CURRENT
-f.config_2wire_resistance_mode(smu, vlimit=1) 
+f.config_2wire_resistance_mode(smu, v_limit) 
 
 try:
-    # Initilization Inputs
-    t_chuck = 20 # Chuck Temperature (°C)
-    i_initial = 10 / 1000 # Initial Current I1 (Amps)
-    f_current = 1.05 # Current Multiplier
-    film_thickness = 200 # Film thickness in nm
-    tcr_ref = .0003
-    #f.get_TCR(film_thickness) # TCR in K^-1
-
-    # Create JSON file
-
-
 
     # 6.1.1: Measure initial resistance (R_chuck) at a very low current
     # We use a low current (e.g., 100uA) to prevent self-heating during the baseline
@@ -58,7 +57,7 @@ try:
         f.tprint(f"Applying Current - I: {current_i:.4f} A | R: {r_i:.4f} Ω | ΔT: {t_i - t_chuck:.2f} °C")
 
         # 6.1.6: Check for failure
-        if r_i >= r_fail_init or current_i > 1000:
+        if r_i >= r_fail_init or current_i > c_limit:
             print("!! FAILURE DETECTED: Resistance limit exceeded. Exiting.")
             break
 
