@@ -10,7 +10,7 @@ start_func_time = time.perf_counter()
 session_start = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
 log_folder.mkdir(parents=True, exist_ok=True)
 log_file = log_folder / f"log_{session_start}.csv"
-headers = ["Date", "Time Elapsed", "Iteration #", "Current (mA)", "Resistance (Ω)", "Change in Temperature (°C)"]
+headers = ["Date", "Time Elapsed", "Iteration #", "Current (mA)", "Resistance (Ω)","Power (W)", "Temperature (°C)", "Change in Temperature (°C)"]
 
 def initialize_smu(resource_id):
     """Connects to the instrument and performs a basic reset."""
@@ -129,7 +129,7 @@ def csvheader ():
         writer = csv.writer(f)
         writer.writerow(headers)
 
-def printcsv (iteration, current, resistance, temperature):
+def printcsv (iteration, current, resistance, power, temperature, changetemperature):
     with open(log_file, "a", newline = '', encoding = "utf-8") as f:
         writer = csv.writer(f)
         now = datetime.now()
@@ -139,4 +139,7 @@ def printcsv (iteration, current, resistance, temperature):
         hours, rem = divmod(total_elapsed, 3600)
         minutes, seconds = divmod(rem, 60)
         elapsed_str = f"{int(hours):02}:{int(minutes):02}:{seconds:06.3f}"
-        writer.writerow([timestamp_str, elapsed_str, iteration, f"{current:.3f}", f"{resistance:.3f}", f"{temperature:.3f}"])
+        writer.writerow([timestamp_str, elapsed_str, iteration, f"{current:.3f}", f"{resistance:.3f}", f"{power:.3f}", f"{temperature:.3f}", f"{changetemperature:.3f}"])
+
+# Temperature Staircase
+ 

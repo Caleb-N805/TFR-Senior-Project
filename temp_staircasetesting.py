@@ -1,9 +1,22 @@
+''' PRE TEST '''
+
+
 import functions as f
 import sys
 import time
 
-# Initilization Inputs
+# Temperature Staircase Inputs
 t_chuck = 20 # Chuck Temperature (°C)
+t_test = 200 # Test Temperature (°C)
+f_power = 2 # Convergence factor
+dt = 10 # Step Temperature (°C)
+
+# Slope and intercepts from line of best fit for P vs. T from Initialization
+'''PLACEHOLDER'''
+r_thermal = 116.99 # Thermal Resistance (°C/W)
+t_0_1 = 16.02 # Temperature intercept (°C)
+r_chuck = 566 # Resistance at chuck temp
+
 i_initial = .5e-2 # Initial Current I1 (Amps)
 f_current = 1.05 # Current Multiplier
 film_thickness = 200 # Film thickness in nm
@@ -26,19 +39,24 @@ if mode == 2:
 else:
     f.config_4wire_resistance_mode(smu, v_limit)
 
+
+''' TEST '''
+
+
 try:
 
-    # 6.1.1: Measure initial resistance (R_chuck) at a very low current
-    # We use a low current (e.g., 100uA) to prevent self-heating during the baseline
-    
-    print("\nMeasuring baseline R_chuck...")
+    # 6.2.1: Calculate temperature step and staircase temperature limit
+    t_staircase = t_test - f_power * dt
+    print("Staircase temperature is ", t_staircase)
+
+    # 6.2.2: Instrument range and voltage compliance for staircase, convergence, stress phases
+
+
     if mode == 2:
         r_chuck = f.measure_resistance_2wire(smu, 1e-2) 
     else:
         r_chuck = f.measure_resistance_4wire(smu, 1e-2)
 
-    print(f"R_chuck: {r_chuck:.4f} Ω")
-    f.tprint("Measuring Chuck Resistance...")
     f.csvheader()
 
     # --- 6.1.4: Initialization ---
