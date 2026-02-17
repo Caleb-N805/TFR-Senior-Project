@@ -140,3 +140,5 @@ def printcsv (iteration, current, resistance, temperature):
         minutes, seconds = divmod(rem, 60)
         elapsed_str = f"{int(hours):02}:{int(minutes):02}:{seconds:06.3f}"
         writer.writerow([timestamp_str, elapsed_str, iteration, f"{current:.3f}", f"{resistance:.3f}", f"{temperature:.3f}"])
+
+# Temperature Staircase
