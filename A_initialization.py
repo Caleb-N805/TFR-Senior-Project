@@ -7,11 +7,11 @@ t_chuck = 20 # Chuck Temperature (°C)
 i_initial = .5e-2 # Initial Current I1 (Amps)
 f_current = 1.05 # Current Multiplier
 film_thickness = 200 # Film thickness in nm
+#f.get_TCR(film_thickness) # TCR in K^-1
 tcr_ref = .0061
 c_limit = .1 # Amps
 v_limit = 20 # Volts
 time_delay = 0 # seconds
-#f.get_TCR(film_thickness) # TCR in K^-1
 
 # --- Setup Connection ---
 resource_id = 'USB0::0x05E6::0x2450::04419551::INSTR'
