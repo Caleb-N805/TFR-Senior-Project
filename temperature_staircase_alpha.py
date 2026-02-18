@@ -1,7 +1,7 @@
 ''' PRE TEST '''
 
 
-import functions as f
+import functions_test_alpha as f
 import sys
 import time
 

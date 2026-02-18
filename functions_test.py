@@ -4,7 +4,7 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
-# Variables
+# Variables for CSV log file
 log_folder = Path("logs")
 start_func_time = time.perf_counter()
 session_start = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
