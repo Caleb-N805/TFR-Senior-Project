@@ -27,7 +27,7 @@ def analyze_power_vs_temp(csv_path):
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
     r_squared = r_value**2
 
-    '''
+    
     #region --- Plot, optional
 
     # Plotting
@@ -47,6 +47,6 @@ def analyze_power_vs_temp(csv_path):
     plt.savefig('power_vs_temp_plot.png')
 
     #endregion
-    '''
+    
 
     return slope, intercept, r_squared

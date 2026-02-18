@@ -63,7 +63,7 @@ try:
     while True:
         # 6.1.5: Apply forcing current and measure resistance
         # Logic matches the gray box in your flowchart
-        r_i = f.measure_resistance(smu, current_i)
+        r_i = f.measure_resistance_2wire(smu, current_i)
         
         # Calculate Power (P = I^2 * R)
         p_i = (current_i ** 2) * r_i

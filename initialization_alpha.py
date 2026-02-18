@@ -11,12 +11,12 @@ import time
 
 t_chuck = 20 # Chuck Temperature (°C)
 i_initial = .5e-2 # Initial Current I1 (Amps)
-f_current = 1.05 # Current Multiplier
+f_current = 1.02 # Current Multiplier
 film_thickness = 200 # Film thickness in nm
 tcr_ref = .0061
 c_limit = .1 # Amps
 v_limit = 20 # Volts
-time_delay = 0 # seconds
+time_delay = .5 # seconds
 mode = 2 # wire
 #f.get_TCR(film_thickness) # TCR in K^-1
 
@@ -31,7 +31,7 @@ log_path, headers, start_func_time = f.initialize_log_file(prefix)
 resource_id = 'USB0::0x05E6::0x2450::04419551::INSTR' # Fixed resource ID for Keithley 2450
 smu, rm = f.initialize_smu(resource_id) # Initializes SMU
 
-f.top_message(log_path, "A -- Initialization") # Header for .csv file
+f.top_message(log_path, "A -- Initialization\n") # Header for .csv file
 
 # Configure for Current Sourcing and 2-wire or 4-wire mode:
 if mode == 2:
@@ -84,7 +84,10 @@ try:
     while True:
         # 6.1.5: Apply forcing current and measure resistance
         # Logic matches the gray box in your flowchart
-        r_i = f.measure_resistance(smu, current_i)
+        if mode == 2:
+            r_i = f.measure_resistance_2wire(smu, current_i)
+        else:
+            r_i = f.measure_resistance_4wire(smu, current_i)
         
         # Calculate Power (P = I^2 * R)
         p_i = (current_i ** 2) * r_i
