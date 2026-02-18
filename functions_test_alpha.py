@@ -4,7 +4,13 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
-''' ELECTRICAL TESTING '''
+# Variables for CSV log file
+log_folder = Path("logs")
+start_func_time = time.perf_counter()
+session_start = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
+log_folder.mkdir(parents=True, exist_ok=True)
+log_file = log_folder / f"log_{session_start}.csv"
+headers = ["Date", "Time Elapsed", "Iteration #", "Current (mA)", "Resistance (Ω)", "Change in Temperature (°C)"]
 
 def initialize_smu(resource_id):
     """Connects to the instrument and performs a basic reset."""
@@ -106,20 +112,7 @@ def measure_resistance_4wire(instrument, current_level):
     
     return calculated_r
 
-''' LOG FILE '''
-
-def initialize_log_file(prefix):
-    # Variables
-    log_folder = Path("logs")
-    start_func_time = time.perf_counter()
-    session_start = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
-    log_folder.mkdir(parents=True, exist_ok=True) # Check that log folder exists
-    log_path = log_folder / f"{prefix}_log_{session_start}.csv"
-    headers = ["Date", "Time Elapsed", "Iteration #", "Current (mA)", "Resistance (Ohms)","Power (W)", "Temperature (C)", "Change in Temperature (C)"]
-
-    return log_path, headers, start_func_time
-
-def tprint(log_path, start_func_time, string):
+def tprint(string):
     now = datetime.now()
     perf_now = time.perf_counter()
     timestamp_str = now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
@@ -128,20 +121,16 @@ def tprint(log_path, start_func_time, string):
     minutes, seconds = divmod(rem, 60)
     elapsed_str = f"{int(hours):02}:{int(minutes):02}:{seconds:06.3f}"
     log_entry = f"[{timestamp_str}] (Total Time Elapsed: {elapsed_str}) - {string}\n"
-    with open(log_path, "a", encoding="utf-8") as f:
+    with open(log_file, "a", encoding="utf-8") as f:
         f.write(log_entry)
 
-def top_message(log_path, string):
-    with open(log_path, "a", encoding="utf-8") as f:
-        f.write(string)
-
-def csvheader(log_path, headers):
-    with open(log_path, "a", newline = "", encoding="utf-8") as f:
+def csvheader ():
+    with open(log_file, "a", newline = "", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(headers)
 
-def printcsv(log_path, start_func_time, iteration, current, resistance, power, temperature, changetemperature):
-    with open(log_path, "a", newline = '', encoding = "utf-8") as f:
+def printcsv (iteration, current, resistance, temperature):
+    with open(log_file, "a", newline = '', encoding = "utf-8") as f:
         writer = csv.writer(f)
         now = datetime.now()
         perf_now = time.perf_counter()
@@ -150,7 +139,6 @@ def printcsv(log_path, start_func_time, iteration, current, resistance, power, t
         hours, rem = divmod(total_elapsed, 3600)
         minutes, seconds = divmod(rem, 60)
         elapsed_str = f"{int(hours):02}:{int(minutes):02}:{seconds:06.3f}"
-        writer.writerow([timestamp_str, elapsed_str, iteration, f"{current:.3f}", f"{resistance:.3f}", f"{power:.3f}", f"{temperature:.3f}", f"{changetemperature:.3f}"])
+        writer.writerow([timestamp_str, elapsed_str, iteration, f"{current:.3f}", f"{resistance:.3f}", f"{temperature:.3f}"])
 
-
- 
+# Temperature Staircase
