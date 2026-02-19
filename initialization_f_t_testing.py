@@ -26,8 +26,8 @@ with open(filename, mode='w', newline='') as csvfile:
                 'f_current': round(f_current, 4),
                 'time_delay': round(time_delay, 2),
                 'i': i,
-                'R_th': R_th,
-                'T_0_1': T_0_1
+                'R_th': round(R_th, 2),
+                'T_0_1': round(T_0_1, 4),
             })
 
         print(f"Data successfully logged to {filename} for f_current = {f_current} and time_delay = {time_delay}\n")
