@@ -45,8 +45,8 @@ else:
 try:
 
     # 6.2.1: Calculate temperature step and staircase temperature limit
-    t_staircase = t_test - f_power * dt
-    print("Staircase temperature is ", t_staircase)
+    t_stair = t_test - f_power * dt
+    print("Staircase temperature is ", t_stair)
 
     # 6.2.2: Instrument range and voltage compliance for staircase, convergence, stress phases
     if mode == 2:
@@ -59,6 +59,9 @@ try:
 
     c_limit = math.sqrt(p_test / r_test) # Amps
     v_limit = math.sqrt(p_test * r_test) # Volts
+
+    # 6.2.3: Set temperature ramp iteration
+    n_stair = (t_stair - (t_chuck + 50)) / dt
 
     f.csvheader()
 
