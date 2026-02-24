@@ -69,7 +69,6 @@ try:
 
     # Initialization of loop
     i = 1
-    count = i
     current_i = i_initial
 
     # Data storage for 6.1.7 determination
