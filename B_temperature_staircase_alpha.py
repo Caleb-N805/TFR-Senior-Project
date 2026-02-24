@@ -4,6 +4,7 @@
 import functions_test_alpha as f
 import sys
 import time
+import math
 
 # Temperature Staircase Inputs
 t_chuck = 20 # Chuck Temperature (°C)
@@ -13,16 +14,14 @@ dt = 10 # Step Temperature (°C)
 
 # Slope and intercepts from line of best fit for P vs. T from Initialization
 '''PLACEHOLDER'''
-r_thermal = 116.99 # Thermal Resistance (°C/W)
+r_th = 116.99 # Thermal Resistance (°C/W)
 t_0_1 = 16.02 # Temperature intercept (°C)
+t_test = 1 # Temperature at start of test
 r_chuck = 566 # Resistance at chuck temp
-
 i_initial = .5e-2 # Initial Current I1 (Amps)
 f_current = 1.05 # Current Multiplier
 film_thickness = 200 # Film thickness in nm
-tcr_ref = .0061
-c_limit = .1 # Amps
-v_limit = 20 # Volts
+tcr_chuck = .0061
 time_delay = 0 # seconds
 mode = 2 # wire
 #f.get_TCR(film_thickness) # TCR in K^-1
@@ -46,16 +45,23 @@ else:
 try:
 
     # 6.2.1: Calculate temperature step and staircase temperature limit
-    t_staircase = t_test - f_power * dt
-    print("Staircase temperature is ", t_staircase)
+    t_stair = t_test - f_power * dt
+    print("Staircase temperature is ", t_stair)
 
     # 6.2.2: Instrument range and voltage compliance for staircase, convergence, stress phases
-
-
     if mode == 2:
         r_chuck = f.measure_resistance_2wire(smu, 1e-2) 
     else:
         r_chuck = f.measure_resistance_4wire(smu, 1e-2)
+
+    p_test = (t_test - t_0_1) / r_th
+    r_test = r_chuck * (1 + tcr_chuck * (t_test / (f_current * t_test) - t_chuck))
+
+    c_limit = math.sqrt(p_test / r_test) # Amps
+    v_limit = math.sqrt(p_test * r_test) # Volts
+
+    # 6.2.3: Set temperature ramp iteration
+    n_stair = (t_stair - (t_chuck + 50)) / dt
 
     f.csvheader()
 
