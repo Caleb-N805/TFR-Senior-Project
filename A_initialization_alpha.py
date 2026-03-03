@@ -117,7 +117,7 @@ try:
         time.sleep(time_delay)
         
         # Increment for next iteration
-        current_i *= f_current
+        i_n *= f_current
         n += 1
 
     #endregion

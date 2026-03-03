@@ -20,21 +20,19 @@ t_test = 200 # Test Temperature (°C)
 f_power = 2 # Convergence factor
 dt = 10 # Step Temperature (°C)
 B_E = 1 # Temperature error band (°C)
+F_corr = 1 # Correction factor
 
 # Slope and intercepts from line of best fit for P vs. T from Initialization
 '''PLACEHOLDER VALUES'''
-r_th = 116.99 # Thermal Resistance (°C/W)
-t_0_1 = 16.02 # Temperature intercept (°C)
-t_test = 1 # Temperature at start of test
+r_th = 366.707 # Thermal Resistance (°C/W)
+t_0_1 = 13.39797 # Temperature intercept (°C)
 r_chuck = 566 # Resistance at chuck temp
-t_initialization = 71 # Temperature from end of initialization (°C)
-F_corr = 1 # Correction factor
-A_log_path = r"XASDKAHDGFJAHSDB" # Defined from initialization
+t_initialization = 53 # Temperature from end of initialization (°C)
+A_log_path = r"C:\Users\caleb\OneDrive\Desktop\Senior Project\TFR-Senior-Project\logs\A_log_2026.03.03_09.54.33.csv" # Defined from initialization
 
-i_initial = .5e-2 # Initial Current I1 (Amps)
 film_thickness = 200 # Film thickness in nm
 tcr_chuck = .0061
-time_delay = 0 # seconds
+time_delay = .5 # seconds
 
 mode = 2 # wire
 #f.get_TCR(film_thickness) # TCR in K^-1
@@ -82,7 +80,7 @@ else:
 
 
 try:
-    f.csvheader() # Print CSV header to log file
+    f.csvheader(B_log_path, headers) # Print CSV header to log file
     
     #region --- 6.2.3: Set temperature ramp iteration
     
@@ -104,14 +102,16 @@ try:
         if t_n_1 < t_stair: 
             #region --- 6.2.3.1: Iterative power calculation (staircase)
             t_est = (t_n_1) + dt # Estimate temperature at next step
+            print("\nEstimated temperature for next step is ", t_est)
 
             p_est = (t_est - t_0_1) / r_th # Estimate electrical power necessary to reach t_i
+            print("\nEstimated power for next step is ", p_est)
 
             #endregion
         else:
             #region --- 6.2.3.1: Iterative power calculation (convergence)
             
-            dP = ((t_test + B_E) / (2 - t_initialization)) / r_th
+            dP = ((t_test + B_E) / (2 - t_n_1)) / r_th
             p_est = (dP/f_power) + p_n_1
 
             t_est = t_0_1 + (r_th * p_est)
@@ -146,7 +146,7 @@ try:
         
 
         print(f"[{n}] I: {i_n:.4f} A | R: {r_n:.4f} Ω | P: {p_n:.2f} W | ΔT: {t_n - t_chuck:.2f} °C")
-        f.printcsv(A_log_path, start_func_time, n, i_n * 1000, r_n, p_n, t_n, t_n - t_chuck)
+        f.printcsv(B_log_path, start_func_time, n, i_n * 1000, r_n, p_n, t_n, t_n - t_chuck)
 
         # Save data point
         results.append({'n': n, 'I': i_n, 'R': r_n, 'P': p_n, 'T': t_n})
@@ -157,7 +157,7 @@ try:
 
         r_fail = r_est * (100 + 20)/100
 
-        r_absfail = (math.abs(r_n - r_est) / math.min(r_n, r_est))
+        r_absfail = (abs(r_n - r_est) / min(r_n, r_est))
         if r_absfail >= 20:
             print("you done fucked up")
         

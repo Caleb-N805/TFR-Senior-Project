@@ -1,145 +1,190 @@
-import functions_test as f
+''' PRE TEST '''
+
+#region --- Imports
+
+import functions_test_alpha as f
+import functions_analysis as g
+
+from pathlib import Path
+import sys
 import time
 import math
-import json
-import sys
 
-# ==========================================
-# CONFIGURATION (JESD61A SECTION 6.2)
-# ==========================================
-TARGET_TEMP = 325.0       # Final Stress Temperature (°C)
-STEP_SIZE   = 50.0        # Temperature Step Size (°C) - (Sec 6.2.1)
-TEMP_TOLERANCE = 1.0      # Convergence Error Band (+/- °C) - (Sec 3.6)
-SETTLE_TIME = 2.0         # Seconds to wait at each step for stability
-FAIL_INCREASE = 0.10      # 10% R increase limit during warm-up (Sec 6.2.4)
+#endregion
 
-# Load Initialization Parameters
+#region --- Temperature Staircase Inputs
+
+# Temperature Staircase Inputs
+t_chuck = 20 # Chuck Temperature (°C)
+t_test = 200 # Test Temperature (°C)
+f_power = 2 # Convergence factor
+dt = 10 # Step Temperature (°C)
+B_E = 1 # Temperature error band (°C)
+
+# Slope and intercepts from line of best fit for P vs. T from Initialization
+'''PLACEHOLDER VALUES'''
+r_th = 366.707 # Thermal Resistance (°C/W)
+t_0_1 = 13.39797 # Temperature intercept (°C)
+r_chuck = 566 # Resistance at chuck temp
+t_initialization = 53 # Temperature from end of initialization (°C)
+F_corr = 1 # Correction factor
+A_log_path = r"C:\Users\caleb\OneDrive\Desktop\Senior Project\TFR-Senior-Project\logs\A_log_2026.03.03_09.54.33.csv" # Defined from initialization
+
+i_initial = .5e-2 # Initial Current I1 (Amps)
+film_thickness = 200 # Film thickness in nm
+tcr_chuck = .0061
+time_delay = 0 # seconds
+
+mode = 2 # wire
+#f.get_TCR(film_thickness) # TCR in K^-1
+
+#endregion
+
+#region --- Setup and Configuration
+
+# Initialize log file, which defines B_log_path, headers, start_func_time
+prefix = "B"
+B_log_path, headers, start_func_time = f.initialize_log_file(prefix)
+
+resource_id = 'USB0::0x05E6::0x2450::04419551::INSTR' # Fixed resource ID for Keithley 2450
+smu, rm = f.initialize_smu(resource_id) # Initializes SMU
+
+f.top_message(B_log_path, "A -- Initialization\n") # Header for .csv file
+
+#endregion
+
+#region --- 6.2.1: Calculate temperature step and staircase temperature limit
+
+t_stair = t_test - f_power * dt
+print("Staircase temperature is ", t_stair)
+
+#endregion
+
+#region --- 6.2.2: Instrument range and voltage compliance for staircase, convergence, stress phases
+
+p_test = (t_test - t_0_1) / r_th # Estimated power at target stress temperature
+r_test = r_chuck * (1 + tcr_chuck * ((t_test / F_corr) - t_chuck)) # Estimated resistance at target stress temperature
+
+c_limit = math.sqrt(p_test / r_test) # Amps
+v_limit = math.sqrt(p_test * r_test) # Volts
+
+#endregion
+
+# Configure for Current Sourcing and 2-wire or 4-wire mode:
+if mode == 2:
+    r_chuck = f.measure_resistance_2wire(smu, 1e-2) 
+else:
+    r_chuck = f.measure_resistance_4wire(smu, 1e-2)
+
+
+''' TEST '''
+
+
 try:
-    with open("init_params.json", "r") as infile:
-        data = json.load(infile)
-        R_REF = data["r_ref"]
-        R_TH_INIT = data["r_th"] # Initial R_th from Phase 1
-        TCR = data["tcr"]
-        T_CHUCK = data["t_chuck"]
-        print(f"Loaded: R_ref={R_REF:.4f} | R_th_init={R_TH_INIT:.2f} | TCR={TCR:.6f}")
-except FileNotFoundError:
-    print("CRITICAL ERROR: 'init_params.json' not found. Run Initialization.py first.")
-    sys.exit()
-
-# Setup Connection
-resource_id = 'USB0::0x05E6::0x2450::04419551::INSTR'
-smu, rm = f.initialize_smu(resource_id)
-f.config_4wire_current_source(smu, v_limit=20) # Higher compliance for high temp
-
-def get_temp(r_now):
-    """Calculates T_line using the Joule Heating TCR equation"""
-    # T = T_chuck + (R - R_ref) / (R_ref * TCR)
-    return T_CHUCK + ((r_now - R_REF) / (R_REF * TCR))
-
-try:
-    print(f"\n--- PHASE 2: TEMPERATURE STAIRCASE (Target: {TARGET_TEMP}°C) ---")
+    f.csvheader(B_log_path, headers) # Print CSV header to log file
     
-    current_temp_goal = T_CHUCK
-    current_I = 0.001 # Start low
+    #region --- 6.2.3: Set temperature ramp iteration
     
-    # We maintain a running estimate of R_th because it changes with Temperature
-    R_th_current = R_TH_INIT 
-    
-    # 6.2.1: Determine Staircase Steps
-    # We loop until we are close to the target
-    while current_temp_goal < TARGET_TEMP:
+    n_stair = (t_stair - (t_initialization)) / dt
+
+    #endregion
+
+    # Initialization of loop
+    n = 1
+    # Data storage 
+    results = []
+
+    print("\nStarting Control Loop...")
+    while True:
+
+        if n == 1:
+            t_n_1 = t_initialization
+
+        if t_n_1 < t_stair: 
+            #region --- 6.2.3.1: Iterative power calculation (staircase)
+            t_est = (t_n_1) + dt # Estimate temperature at next step
+            print("\nEstimated temperature for next step is ", t_est)
+
+            p_est = (t_est - t_0_1) / r_th # Estimate electrical power necessary to reach t_i
+            print("\nEstimated power for next step is ", p_est)
+
+            #endregion
+        else:
+            #region --- 6.2.3.1: Iterative power calculation (convergence)
+            
+            dP = ((t_test + B_E) / (2 - t_n_1)) / r_th
+            p_est = (dP/f_power) + p_n_1
+
+            t_est = t_0_1 + (r_th * p_est)
+            
+            #endregion
+
+        #region --- 6.2.3.2: Iterative forcing current calculation
         
-        # Increment Target (don't exceed final target)
-        current_temp_goal += STEP_SIZE
-        if current_temp_goal > TARGET_TEMP:
-            current_temp_goal = TARGET_TEMP
-            
-        print(f"\n>> Ramping to Step: {current_temp_goal:.1f} °C")
+        # (c)
+        r_est = r_chuck * (1 + tcr_chuck * ((t_est / F_corr) - t_chuck)) # Estimated resistance at target stress temperature
         
-        # --- CONTROL LOOP FOR THIS STEP (Sec 6.2.3) ---
-        # We iterate until T is within tolerance of current_temp_goal
-        while True:
-            # 1. Measure State
-            v, i_meas, r_now = f.measure_vals(smu, current_I)
-            t_now = get_temp(r_now)
-            p_now = v * i_meas
-            
-            # 2. Check Safety (Sec 6.2.4)
-            # If R increases significantly > predicted thermal rise, it's damage.
-            # Simplified check: R shouldn't be drastically higher than expected for this Temp.
-            # (Strict JESD61A check requires calculating 'R_fail_step')
-            if r_now > R_REF * 2.0: 
-                raise Exception("FAIL: Resistance doubled. Line broke during ramp.")
+        # (d)
+        i_n = math.sqrt(p_est / r_est) # Calculate new forcing current to heat line to t_est
 
-            print(f"   Meas: T={t_now:.1f}C | R={r_now:.4f} | P={p_now*1000:.1f}mW")
+        # (e)
+        # Apply forcing current and measure resistance
+        if mode == 2:
+            r_n = f.measure_resistance_2wire(smu, i_n)
+        else:
+            r_n = f.measure_resistance_4wire(smu, i_n)
 
-            # 3. Check Convergence for this Step
-            if abs(t_now - current_temp_goal) < TEMP_TOLERANCE:
-                # We reached this step. Update R_th estimate for next step accuracy.
-                # R_th_new = (T_now - T_chuck) / P_now
-                # This accounts for the non-linearity of R_th at high temps.
-                if p_now > 0:
-                    R_th_current = (t_now - T_CHUCK) / p_now
-                
-                print(f"   -> Step Reached. Updated R_th: {R_th_current:.2f} C/W")
-                time.sleep(SETTLE_TIME) # Wait for thermal equilibrium
-                break 
-            
-            # 4. Calculate Next Current (Isothermal Feedback)
-            # Power needed for Goal: P_req = (T_goal - T_chuck) / R_th_current
-            # Current needed: I = sqrt( P_req / R_now )
-            
-            # Note: We use the *updated* R_th_current if we have one, or the initial.
-            p_required = (current_temp_goal - T_CHUCK) / R_th_current
-            
-            if p_required < 0: p_required = 0.001 # Safety
-            
-            # Predictive Current Calculation
-            new_I = math.sqrt(p_required / r_now)
-            
-            # 5. Damping / Safety Limits
-            # Don't let current jump more than 10% in one cycle to prevent oscillation
-            if new_I > current_I * 1.10: new_I = current_I * 1.10
-            if new_I < current_I * 0.90: new_I = current_I * 0.90
-            
-            # Apply
-            current_I = new_I
-            # Small delay for hardware to settle
-            time.sleep(0.1)
+        #endregion
+        
+        #region --- 6.2.3.3: Iterative thermal resistance calculation
 
-    print("\n--- PHASE 2 COMPLETE: TARGET TEMPERATURE REACHED ---")
-    print(f"Final State: T={t_now:.1f}C, I={current_I:.4f}A, R={r_now:.4f}Ω")
+        # (f) Calculate power dissipated and temperature
+        p_n = (i_n ** 2) * r_n
+        t_n = t_chuck + ((r_n - r_chuck)/(r_chuck * tcr_chuck))
+        
+        # (g) Obtain new value for thermal resistance and intercept
+        r_th, t_0_1, R_squared = g.B_analyze_power_vs_temp(t_n, A_log_path, B_log_path)
+        
 
-    # ==========================================
-    # SAVE STATE FOR STRESS TEST
-    # ==========================================
-    # The Stress Test needs to know exactly what Current/Power maintains 325C
-    stress_params = {
-        "target_temp": TARGET_TEMP,
-        "start_current": current_I,
-        "target_power": p_now,     # This is P_test
-        "final_r": r_now,          # Resistance at start of stress
-        "r_ref": R_REF,
-        "tcr": TCR,
-        "t_chuck": T_CHUCK
-    }
-    
-    with open("stress_params.json", "w") as outfile:
-        json.dump(stress_params, outfile)
-    print("Params saved to 'stress_params.json'. Ready for Stress_Test.py")
+        print(f"[{n}] I: {i_n:.4f} A | R: {r_n:.4f} Ω | P: {p_n:.2f} W | ΔT: {t_n - t_chuck:.2f} °C")
+        f.printcsv(A_log_path, start_func_time, n, i_n * 1000, r_n, p_n, t_n, t_n - t_chuck)
 
-except Exception as e:
-    print(f"\nERROR: {e}")
-    smu.write("smu.source.output = smu.OFF")
+        # Save data point
+        results.append({'n': n, 'I': i_n, 'R': r_n, 'P': p_n, 'T': t_n})
+
+        #endregion
+
+        #region --- 6.2.4: Temporary failure criteria for staircase and convergence phases
+
+        r_fail = r_est * (100 + 20)/100
+
+        r_absfail = (abs(r_n - r_est) / min(r_n, r_est))
+        if r_absfail >= 20:
+            print("you done fucked up")
+        
+        #endregion
+        
+        # --- Exit Condition Logic ---
+        # Flowchart requires: T_n >= (T_test)
+        if t_n >= t_test:
+            print(f"\nTarget temperature {t_test} met.")
+            print(f"Temperature Staircase loop finished with {n} loops completed.")
+            break
+
+        # Set arbitrary delay
+        time.sleep(time_delay)
+
+        # Increment for next iteration
+        t_n_1 = t_n
+        p_n_1 = p_n
+        n += 1
+
+    # Print number of iterations
+    print("Number of iterations was", n)
 
 finally:
-    # NOTE: We do NOT turn off the output if we are moving immediately to stress.
-    # However, since this is a separate file, we must turn it off.
-    # *CRITICAL*: In a real setup, these scripts should be combined or the
-    # instrument state preserved. If you turn off output now, the line cools down.
-    # For this modular file approach:
-    print("Keeping Output ON for 5 seconds to demonstrate stability, then OFF.")
-    time.sleep(5)
+    # Safety: Always turn off output and close connection
     smu.write("smu.source.output = smu.OFF")
     smu.close()
     rm.close()
+    print("Instrument safely disconnected.")

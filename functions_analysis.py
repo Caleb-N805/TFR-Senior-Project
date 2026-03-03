@@ -65,8 +65,17 @@ def B_analyze_power_vs_temp(t_n, csv_path_A, csv_path_B):
     # Find the temperature column (it might contain a copyright symbol or similar)
     col_temp = [c for c in df_A.columns if 'Temperature' in c and 'Change' not in c][0]
     
-    # List your dataframes and concatenate them
-    combined_df = pd.concat([df_A, df_B], ignore_index=True)
+    # Create a list of the dataframes you want to join
+    to_concat = [df_A, df_B]
+
+    # Filter out the ones that are empty or all-NA
+    to_concat = [df for df in to_concat if not df.empty and not df.isna().all().all()]
+
+    if to_concat:
+        combined_df = pd.concat(to_concat, ignore_index=True)
+    else:
+        # Handle the case where everything was empty (e.g., create an empty DF with specific columns)
+        combined_df = pd.DataFrame()
 
     # Filter data where:
     # 1. Change in temperature > 0
