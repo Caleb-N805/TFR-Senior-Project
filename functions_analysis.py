@@ -47,6 +47,60 @@ def analyze_power_vs_temp(csv_path):
     plt.savefig('power_vs_temp_plot.png')
 
     #endregion
-    
 
+    return slope, intercept, r_squared
+
+def B_analyze_power_vs_temp(t_n, csv_path_A, csv_path_B):
+    # Analyzes Power vs Temperature for rows where the change in temperature is > 0.
+    # Returns slope, y-intercept, and R^2 value.
+
+    # Read each CSV file, skipping the first 'Initialization' row
+    df_A = pd.read_csv(csv_path_A, skiprows=1)
+    df_B = pd.read_csv(csv_path_B, skiprows=1)
+    df_A.columns = [col.strip() for col in df_A.columns]
+
+    # Identify relevant columns (handling potential character encoding/typos)
+    col_change_t = 'Change in Temperature (C)'
+    col_power = 'Power (W)'
+    # Find the temperature column (it might contain a copyright symbol or similar)
+    col_temp = [c for c in df_A.columns if 'Temperature' in c and 'Change' not in c][0]
+    
+    # List your dataframes and concatenate them
+    combined_df = pd.concat([df_A, df_B], ignore_index=True)
+
+    # Filter data where:
+    # 1. Change in temperature > 0
+    # 2. Temperature is above (t_n - 50)
+    mask = (combined_df[col_change_t] > 0) & (combined_df[col_temp] >= t_n - 50)
+    filtered_df = combined_df[mask].copy()
+
+    x = filtered_df[col_power]
+    y = filtered_df[col_temp]
+
+    # Perform linear regression
+    slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+    r_squared = r_value**2
+
+    '''
+    #region --- Plot, optional
+
+    # Plotting
+    plt.figure(figsize=(10, 6))
+    plt.scatter(x, y, label='Experimental Data', color='blue', alpha=0.5)
+    
+    # Line of best fit
+    fit_line = slope * x + intercept
+    plt.plot(x, fit_line, color='red', 
+             label=f'Linear Fit: $y = {slope:.4f}x + {intercept:.4f}$')
+
+    plt.xlabel('Power (W)')
+    plt.ylabel('Temperature (C)')
+    plt.title('Power (W) vs. Temperature (C) (Filtered for dT > 0)')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('power_vs_temp_plot.png')
+
+    #endregion
+    '''
+    
     return slope, intercept, r_squared
