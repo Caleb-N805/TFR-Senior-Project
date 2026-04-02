@@ -16,12 +16,13 @@ import math
 
 t_chuck = 20 # Chuck Temperature (°C)
 i_initial = .5e-2 # Initial Current I1 (Amps)
-f_current = 1.02 # Current Multiplier
+f_current = 1.05 # Current Multiplier
 film_thickness = 200 # Film thickness in nm
 tcr_ref = .0061
 i_limit = .1 # Amps
 v_limit = 20 # Volts
-time_delay = 2 # seconds
+initialization_time_delay = 2 # seconds
+convergence_time_delay = 3 # seconds
 mode = 2 # wire
 #f.get_TCR(film_thickness) # TCR in K^-1
 
@@ -29,9 +30,8 @@ mode = 2 # wire
 t_test = 140 # Test Temperature (°C)
 f_power = 2 # Convergence factor
 dt = 8 # Step Temperature (°C)
-B_E = 1 # Temperature error band (°C)
+B_E = 3 # Temperature error band (°C)
 F_corr = 1 # Correction factor
-
 #endregion
 
 '''Initialization'''
@@ -66,9 +66,9 @@ try:
     
     print("\nMeasuring baseline R_chuck...")
     if mode == 2:
-        r_chuck = f.measure_resistance_2wire(smu, 1e-2)
+        r_chuck = f.measure_resistance_2wire(smu, 1e-3)
     else:
-        r_chuck = f.measure_resistance_4wire(smu, 1e-2)
+        r_chuck = f.measure_resistance_4wire(smu, 1e-3)
 
     print(f"R_chuck: {r_chuck:.4f} Ω")
 
@@ -128,7 +128,7 @@ try:
             break
 
         # If no failure, set arbitrary delay before next loop
-        time.sleep(time_delay)
+        time.sleep(initialization_time_delay)
         
         # Increment for next iteration
         i_n *= f_current
@@ -192,7 +192,7 @@ v_limit = math.sqrt(p_test * r_test) # Volts
 
 #endregion
 
-
+time.sleep(10)
 
 ''' TEST '''
 
@@ -243,6 +243,7 @@ try:
         
         # (c)
         r_est = r_chuck * (1 + tcr_ref * ((t_est / F_corr) - t_chuck)) # Estimated resistance at target stress temperature
+        print("\nEstimated resistance is ", r_est)
         
         # (d)
         i_n = math.sqrt(p_est / r_est) # Calculate new forcing current to heat line to t_est
@@ -264,6 +265,7 @@ try:
         
         # (g) Obtain new value for thermal resistance and intercept
         r_th, t_0_1, R_squared = g.B_analyze_power_vs_temp(t_n, A_log_path, B_log_path)
+        print(f"\nR_th: {r_th:.4f}, t_0_1: {t_0_1:.4f}, R_squared: {R_squared:.4f}")
         
 
         print(f"[{n}] I: {i_n:.4f} A | R: {r_n:.4f} Ω | P: {p_n:.2f} W | ΔT: {t_n - t_chuck:.2f} °C | T: {t_n:.2f} C")
@@ -278,21 +280,22 @@ try:
 
         r_fail = r_est * (100 + 20)/100
 
-        r_absfail = (abs(r_n - r_est) / min(r_n, r_est))
+        r_absfail = 100 * (abs(r_n - r_est) / min(r_n, r_est))
         if r_absfail >= 20:
             print("you done fucked up")
+            break
         
         #endregion
         
         # --- Exit Condition Logic ---
         # Flowchart requires: T_n >= (T_test)
-        if t_n >= t_test:
+        if t_n >= t_test - B_E/2:
             print(f"\nTarget temperature {t_test} met.")
             print(f"Temperature Staircase loop finished with {n} loops completed.")
             break
 
         # Set arbitrary delay
-        time.sleep(time_delay)
+        time.sleep(convergence_time_delay)
 
         # Increment for next iteration
         t_n_1 = t_n
@@ -301,6 +304,7 @@ try:
 
     # Print number of iterations
     print("Number of iterations was", n)
+
 
 
 finally:
