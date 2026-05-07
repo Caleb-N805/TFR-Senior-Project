@@ -30,14 +30,14 @@ def config_2wire_resistance_mode(instrument, vlimit):
     print("TSP: 2-Wire Source Configured.")
 
 def config_4wire_resistance_mode(instrument, vlimit):
-    """Sets up 4-wire sense for current sourcing."""
-    # Set to Current Source
+    instrument.write("reset()")
     instrument.write("smu.source.func = smu.FUNC_DC_CURRENT")
-    # Set to 4-Wire Sense
-    instrument.write("smu.measure.sense = smu.SENSE_4WIRE")
-    # Set Current Limit (Compliance)
     instrument.write(f"smu.source.vlimit.level = {vlimit}")
-    print("TSP: 4-Wire Source Configured.")
+    instrument.write("smu.measure.func = smu.FUNC_DC_VOLTAGE")
+    instrument.write("smu.measure.sense = smu.SENSE_4WIRE")
+    instrument.write("smu.measure.autorange = smu.ON")
+    instrument.write("smu.measure.nplc = 1")
+    instrument.write("smu.source.delay = 0.1")
 
 def get_TCR(thickness):
     """Finds TCR based on thin film thickness in nm"""
@@ -85,11 +85,6 @@ def measure_resistance_4wire(instrument, current_level):
     
     # 2. Set measurement function to Voltage
     instrument.write("smu.measure.func = smu.FUNC_DC_VOLTAGE")
-
-    # --- NEW: Enable 4-Wire (Remote) Sensing ---
-    # This tells the SMU to use the 'Sense' terminals instead of the 'Input' terminals
-    instrument.write("smu.measure.sense = smu.SENSE_REMOTE")
-    # -------------------------------------------
     
     # 3. Turn on the output
     instrument.write("smu.source.output = smu.ON")

@@ -15,19 +15,19 @@ import math
 # Initialization Inputs
 
 t_chuck = 20 # Chuck Temperature (°C)
-i_initial = .5e-2 # Initial Current I1 (Amps)
+i_initial = 5e-2 # Initial Current I1 (Amps)
 f_current = 1.05 # Current Multiplier
 film_thickness = 200 # Film thickness in nm
-tcr_ref = .0061
+tcr_ref = .0034
 i_limit = .1 # Amps
 v_limit = 20 # Volts
 initialization_time_delay = 2 # seconds
 convergence_time_delay = 3 # seconds
-mode = 2 # wire
+mode = 4 # wire
 #f.get_TCR(film_thickness) # TCR in K^-1
 
 # Temperature Staircase Inputs
-t_test = 140 # Test Temperature (°C)
+t_test = 200 # Test Temperature (°C)
 f_power = 2 # Convergence factor
 dt = 8 # Step Temperature (°C)
 B_E = 3 # Temperature error band (°C)
@@ -66,9 +66,9 @@ try:
     
     print("\nMeasuring baseline R_chuck...")
     if mode == 2:
-        r_chuck = f.measure_resistance_2wire(smu, 1e-3)
+        r_chuck = f.measure_resistance_2wire(smu, i_initial)
     else:
-        r_chuck = f.measure_resistance_4wire(smu, 1e-3)
+        r_chuck = f.measure_resistance_4wire(smu, i_initial)
 
     print(f"R_chuck: {r_chuck:.4f} Ω")
 
@@ -304,7 +304,6 @@ try:
 
     # Print number of iterations
     print("Number of iterations was", n)
-
 
 
 finally:
