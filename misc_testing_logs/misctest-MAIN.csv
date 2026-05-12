@@ -1,1 +1,1 @@
-Wafer,Die,Resistor,R_chuck,t_min,t_fail,I
+wafer_number, die_number, resistor_number, t_device_lifetime, t_fail, t_min, r_chuck, r_min, c_test

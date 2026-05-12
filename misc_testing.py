@@ -11,7 +11,8 @@ import csv
 
 c_limit = 1.05 # Amps
 v_limit = 20 # Volts
-c_test = 1 # Amps
+
+c_test = .5 # Amps
 
 # Function that returns average dr/dt of last 25 values
 def last_25_average_drdt(t_values, r_values):
@@ -44,12 +45,13 @@ def last_25_average_min_values(t_values, r_values):
 
 #endregion
 
+
 #region --- Log File Initialization
 
 # Create log file for individual test (user input values)
-wafer_number = input("Wafer:")
-die_number = input("Die:")
-resistor_number = input("Resistor:")
+wafer_number = input("Wafer: (ex. W4)")
+die_number = input("Die: (ex. G3)")
+resistor_number = input("Resistor: (ex. 0, 100, 500, SA, SB)")
 
 # Define log file path for individual test
 log_folder = Path("misc_testing_logs")
@@ -62,6 +64,7 @@ main_log_folder.mkdir(parents=True, exist_ok=True) # Check that log folder exist
 main_log_path = log_folder / f"misctest-MAIN.csv"
 
 #endregion
+
 
 #region --- Threading (press Enter at any time to stop program)
 
@@ -77,6 +80,7 @@ def wait_for_enter():
 threading.Thread(target=wait_for_enter, daemon=True).start()
 
 #endregion
+
 
 #region --- Testing
 
@@ -140,8 +144,12 @@ print("Instrument safely disconnected.")
 
 #endregion
 
+
 # Adjusted list for resistance tracking change in resistance compared to minimum
 r_adjusted_list = [r - r_min for r in r_list]
+
+# Device lifetime (only considering Joule heating)
+t_device_lifetime = t_fail - t_min
 
 #region --- Write log files
 
@@ -157,8 +165,6 @@ with open(log_path, 'w', newline='') as f:
 with open(main_log_path, 'a', newline='') as f:
     writer = csv.writer(f)
     # Pair the lists and write them as rows
-    writer.writerow(wafer_number, die_number, resistor_number, r_chuck, t_min, t_fail, c_test)
+    writer.writerow(wafer_number, die_number, resistor_number, t_device_lifetime, t_fail, t_min, r_chuck, r_min, c_test)
 
 #endregion
-
-
