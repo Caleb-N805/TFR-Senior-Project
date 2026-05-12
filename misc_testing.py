@@ -12,7 +12,7 @@ import csv
 c_limit = 1.05 # Amps
 v_limit = 20 # Volts
 
-c_test = .5 # Amps
+c_test = 1 # Amps
 
 # Function that returns average dr/dt of last 25 values
 def last_25_average_drdt(t_values, r_values):
@@ -49,9 +49,9 @@ def last_25_average_min_values(t_values, r_values):
 #region --- Log File Initialization
 
 # Create log file for individual test (user input values)
-wafer_number = input("Wafer: (ex. W4)")
-die_number = input("Die: (ex. G3)")
-resistor_number = input("Resistor: (ex. 0, 100, 500, SA, SB)")
+wafer_number = input("Wafer: (ex. W4) ")
+die_number = input("Die: (ex. G3) ")
+resistor_number = input("Resistor: (ex. 0, 100, 500, SA, SB) ")
 
 # Define log file path for individual test
 log_folder = Path("misc_testing_logs")
@@ -93,10 +93,10 @@ smu, rm = f.initialize_smu(resource_id)
 f.config_4wire_resistance_mode(smu, v_limit) 
 
 # Measure initial resistance
+r_chuck = f.measure_resistance_4wire(smu, .01) 
+r_chuck = f.measure_resistance_4wire(smu, .1) 
 r_chuck = f.measure_resistance_4wire(smu, c_test) 
 print(f"R_chuck: {r_chuck:.4f} Ω")
-
-time.sleep(5)
 
 # Initialize lists
 r_list = []
@@ -106,6 +106,10 @@ i_list = []
 # Setup for minimum function
 minimum = False
 iterations = 0
+
+# In case test fails before minimum is even hit:
+t_min = 0
+r_min = r_chuck
 
 start_time = time.time() # Start test
 
@@ -165,6 +169,6 @@ with open(log_path, 'w', newline='') as f:
 with open(main_log_path, 'a', newline='') as f:
     writer = csv.writer(f)
     # Pair the lists and write them as rows
-    writer.writerow(wafer_number, die_number, resistor_number, t_device_lifetime, t_fail, t_min, r_chuck, r_min, c_test)
+    writer.writerow([wafer_number, die_number, resistor_number, t_device_lifetime, t_fail, t_min, r_chuck, r_min, c_test])
 
 #endregion
