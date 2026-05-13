@@ -19,7 +19,7 @@ def last_50_average_drdt(t_values, r_values):
 
     drdt_values = []
 
-    # Last 50 intervals use the last 26 points
+    # Last 50 intervals use the last 51 points
     for i in range(len(t_values) - 50, len(t_values)):
         dt = t_values[i] - t_values[i - 1]
         dr = r_values[i] - r_values[i - 1]
@@ -49,7 +49,7 @@ def last_50_average_min_values(t_values, r_values):
 #region --- Log File Initialization
 
 # Create log file for individual test (user input values)
-wafer_number = input("Wafer: (ex. W4) ")
+wafer_number = "W4"
 die_number = input("Die: (ex. G3) ")
 resistor_number = input("Resistor: (ex. 0, 100, 500, SA, SB) ")
 
