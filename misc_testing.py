@@ -14,13 +14,13 @@ v_limit = 20 # Volts
 
 c_test = 1 # Amps
 
-# Function that returns average dr/dt of last 25 values
-def last_25_average_drdt(t_values, r_values):
+# Function that returns average dr/dt of last 50 values
+def last_50_average_drdt(t_values, r_values):
 
     drdt_values = []
 
-    # Last 25 intervals use the last 26 points
-    for i in range(len(t_values) - 25, len(t_values)):
+    # Last 50 intervals use the last 26 points
+    for i in range(len(t_values) - 50, len(t_values)):
         dt = t_values[i] - t_values[i - 1]
         dr = r_values[i] - r_values[i - 1]
 
@@ -33,13 +33,13 @@ def last_25_average_drdt(t_values, r_values):
     else:
         return "negative"
 
-# Function that returns average t and minimum r of last 25 values
-def last_25_average_min_values(t_values, r_values):
-    last_25_t = t_values[-25:]
-    last_25_r = r_values[-25:]
+# Function that returns average t and minimum r of last 50 values
+def last_50_average_min_values(t_values, r_values):
+    last_50_t = t_values[-50:]
+    last_50_r = r_values[-50:]
 
-    t_avg = sum(last_25_t) / len(last_25_t)
-    r_min = min(last_25_r)
+    t_avg = sum(last_50_t) / len(last_50_t)
+    r_min = min(last_50_r)
 
     return t_avg, r_min
 
@@ -123,9 +123,9 @@ while not stop:
     t_list.append(elapsed)
     i_list.append(c_test)
 
-    if iterations > 25: # Need to have at least 25 iterations to find minimum
-        if last_25_average_drdt(t_list, r_list) == "positive" and minimum == False:
-            t_min, r_min = last_25_average_min_values(t_list, r_list)
+    if iterations > 50: # Need to have at least 50 iterations to find minimum
+        if last_50_average_drdt(t_list, r_list) == "positive" and minimum == False:
+            t_min, r_min = last_50_average_min_values(t_list, r_list)
             print(f"t_min: {t_min:.1f} s")
             print(f"R_min: {r_min:.1f} ohms")
             minimum = True # Can't have minimum again
