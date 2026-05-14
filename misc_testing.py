@@ -59,7 +59,7 @@ log_folder.mkdir(parents=True, exist_ok=True) # Check that log folder exists
 log_path = log_folder / f"misctest-{wafer_number}-{die_number}-{resistor_number}.csv"
 
 # Define main log file path for ALL tests and all results
-main_log_folder = Path("misc_testing_logs")
+main_log_folder = Path("main_log")
 main_log_folder.mkdir(parents=True, exist_ok=True) # Check that log folder exists
 main_log_path = log_folder / f"misctest-MAIN.csv"
 
