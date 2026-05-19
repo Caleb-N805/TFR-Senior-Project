@@ -226,6 +226,6 @@ def summarize_folder(input_folder, output_csv, failure_percent, pattern="*.csv")
 
 summarize_folder(
     input_folder=r"C:\Users\cnomi\Documents\GitHub\TFR-Senior-Project\misc_testing_logs",
-    output_csv="new_misc_results.csv",
+    output_csv="new_misc_results2.csv",
     failure_percent=10
 )
