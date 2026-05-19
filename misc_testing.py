@@ -51,7 +51,7 @@ def last_50_average_min_values(t_values, r_values):
 # Create log file for individual test (user input values)
 wafer_number = "W4"
 die_number = input("Die: (ex. G3) ")
-resistor_number = input("Resistor: (ex. 0, 100, 500, SA, SB) ")
+resistor_number = "SA"
 
 # Define log file path for individual test
 log_folder = Path("misc_testing_logs")
